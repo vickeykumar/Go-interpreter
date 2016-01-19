@@ -21,13 +21,6 @@ CommandHelpStr = {  ":help, :h CommandName" : "Print Help Menu",
 CommandArg = ''
 
 # utility functions
-def run():
-	createImportStringAndBodyString(importSet, bodylist)
-	progstr = packageName + "\n" + importstring + bodystring
-	f = open(filename,"w")
-	f.write(progstr)
-	os.system("go run " + filename)
-
 def displayDoc():
 	commandstr = 'godoc ' + CommandArg
 	os.system(commandstr)
@@ -50,9 +43,16 @@ def display():
 	except Exception,e:
 			print "ERROR: invalid argument ",str(e)
 
-def createImportStringAndBodyString(importSet, bodylist):
-	bodystring = "\t".join(bodylist) + "\t/*!body*/" + "\tvar " + ",".join(["_" for v in variableSet]) + " = " + ",".join([v for v in variableSet]) + "\n}"
+def createImportStringAndBodyString(importSet, bodylist, tempstr = ''):
+	bodystring = "\t".join(bodylist) + tempstr + "\t/*!body*/" + "\tvar " + ",".join(["_" for v in variableSet]) + " = " + ",".join([v for v in variableSet]) + "\n}"
 	importstring = "import (\n\t" + "\n\t".join([pkg if pkg.strip('"')+'.' in bodystring else '_ '+pkg for pkg in importset]) + "\n)\n"
+
+def run(printstr = ''):
+	createImportStringAndBodyString(importSet, bodylist, printstr)
+	progstr = packageName + "\n" + importstring + bodystring
+	f = open(filename,"w")
+	f.write(progstr)
+	os.system("go run " + filename)
 
 def PrintHelp():
 	print "\n  COMMANDS:\n"
@@ -85,3 +85,6 @@ def editSourceFile():
 		else:
 			print "ERROR: invalid argument ",str(e)
 
+
+if __name__ == "__main__":
+	main()
