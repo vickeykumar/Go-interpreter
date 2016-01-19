@@ -15,12 +15,17 @@ CommandHelpStr = {  ":help, :h CommandName" : "Print Help Menu",
 		":d <line no, range>" : "Display a line or a Range of lines (given as L1:L2) or comma separated lines",
 		":r, :x" : "Run as Go File",
 		":q" : "Quit the session",
+<<<<<<< HEAD
 		":c" : "Clear the session,and Restart",
 		":doc <packageName> <functionName>" : "Display the documentation"
+=======
+		":c" : "Clear the session,and Restart"
+>>>>>>> 9f5fd4be9e90dbeb0b3d03117421f41791e912f7
 		}
 CommandArg = ''
 
 # utility functions
+<<<<<<< HEAD
 def run():
 	createImportStringAndBodyString(importSet, bodylist)
 	progstr = packageName + "\n" + importstring + bodystring
@@ -53,6 +58,11 @@ def display():
 def createImportStringAndBodyString(importSet, bodylist):
 	bodystring = "\t".join(bodylist) + "\t/*!body*/" + "\tvar " + ",".join(["_" for v in variableSet]) + " = " + ",".join([v for v in variableSet]) + "\n}"
 	importstring = "import (\n\t" + "\n\t".join([pkg if pkg.strip('"')+'.' in bodystring else '_ '+pkg for pkg in importset]) + "\n)\n"
+=======
+def createImportStringAndBodyString(importSet, bodylist):
+	bodystring = "\t".join(bodylist) + "\t/*!body*/" + "\tvar " + ",".join(["_" for v in variableSet]) + " = " + ",".join([v for v in variableSet]) + "\n}"
+	importstring = "import (\n\t" + "\n\t".join([pkg if pkg.strip('"')+'.' in bodystring else '_ '+pkg for pkg in importset]) + "\n)"
+>>>>>>> 9f5fd4be9e90dbeb0b3d03117421f41791e912f7
 
 def PrintHelp():
 	print "\n  COMMANDS:\n"
@@ -79,9 +89,18 @@ def editSourceFile():
 				del(bodylist[i - offset])
 		else:
 			print "invalid argument"
+<<<<<<< HEAD
 	except Exception,e:
 		if (i.strip() == "vim") or (i.strip() == ""):
 			os.system(EDITOR + " " + filename)
 		else:
 			print "ERROR: invalid argument ",str(e)
+=======
+	except:
+		if (i.strip() == "vim") or (i.strip() == ""):
+			os.system(EDITOR + " " + filename)
+		else:
+			print "invalid argument"
+
+>>>>>>> 9f5fd4be9e90dbeb0b3d03117421f41791e912f7
 
