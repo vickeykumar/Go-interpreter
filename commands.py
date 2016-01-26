@@ -71,7 +71,7 @@ def GetInput(inputstring = ''):
 			inputstring = inputstring[0:-1]
 			out,err = run("fmt.Println(" + inputstring + ")")
 			if err == '':
-				print out
+				print out,
 			else:
 				run(inputstring)
 		else:
