@@ -199,7 +199,7 @@ def run(tempstr = ''):
 	f.close()
 	out,err = subprocess.Popen("go run " + filename,stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
 	if not suppressOutput:
-		print out+err
+		print out+err,
 	else:
 		suppressOutput =False
 		return out,err
