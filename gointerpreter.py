@@ -7,6 +7,15 @@ def main():
 	print "*                  WELCOME TO GO INTERPRETER                            *"
 	print "*************************************************************************\n"
 	PrintHelp()
+	init()
+	while (1):
+		try:
+			GetInput(raw_input("go>>").strip())
+		except Exception,e:
+			print "Error: ",str(e)
+			pass
 
 if __name__ == "__main__":
 	main()
+
+
