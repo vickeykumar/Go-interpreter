@@ -85,14 +85,19 @@ def GetInput(inputstring = ''):
 
 def updateVariableSet(inputstring=''):
 	global variableSet
+	flag = False
 	v = ''
 	if inputstring.startswith("var"):
 		v = inputstring.split()[1]
 	elif len(inputstring.split(':=',1)) > 1:
 		v = inputstring.split(':=',1)[0]
-	if v != '' and v not in variableSet:				#variable caught
-		variableSet.append(v)
-		return True
+	if v != '' :		#variable caught
+		var1 =[i.strip() for i in v.split(",")]
+		for v in var1:
+			if v != "_" and v not in variableSet :
+				variableSet.append(v)
+				flag = True
+	return flag
 
 def displayDoc():
 	global CommandArg
@@ -146,7 +151,7 @@ def GetBodyString(tempstr = ''):
 
 def GetImportString():
 	global importstring,importset,bodystring
-	importstring = "import (\n\t" + "\n\t".join([pkg if pkg.strip('"')+'.' in bodystring else '_ '+pkg for pkg in importset]) + "\n)\n"
+	importstring = "import (\n\t" + "\n\t".join([pkg if pkg.split("/")[-1].strip('"')+'.' in bodystring else '_ '+pkg for pkg in importset]) + "\n)\n"
 	return importstring
 
 def GetBodyString(tempstr = ''):
@@ -171,19 +176,20 @@ def GetBlockInput(startstring=''):
 		while notabs > 0 :
 			inp = raw_input().strip()
 			if inp != '' :
+				if inp[-1] == '}':
+					notabs -= 1
 				inp = ''.join(["\t" for i in range(notabs)]) + inp
 				tempbodylist.append(inp)
 				if inp[-1] == '{':
 					notabs += 1
-				elif inp[-1] == '}':
-					notabs -= 1
+				
 		if isStringinStartofList("import",tempbodylist):
 			raise SyntaxError("wrong import inside a block")
 		tempstr = '\n\t'.join(tempbodylist)
 
 		if startstring.startswith("func "):
 			bodylist = tempbodylist + bodylist
-			headerstring = tempstr + '\n\t' +headerstring
+			headerstring = tempstr + '\n' +headerstring
 		else:
 			bodylist += tempbodylist
 			headerstring += '\n\t' + tempstr
