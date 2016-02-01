@@ -203,7 +203,7 @@ def run(tempstr = ''):
 	f = open(filename,"w")
 	f.write(progstr)
 	f.close()
-	out,err = subprocess.Popen("go run " + filename,stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
+	out,err = subprocess.Popen("go run " + filename,stderr=subprocess.PIPE).communicate()
 	if not suppressOutput:
 		print out+err,
 	else:
