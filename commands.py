@@ -23,7 +23,6 @@ CommandHelpStr = {  ":h CommandName" : "Print Help Menu",
 		":doc <packageName> <functionName>" : "Display the documentation"
 		}
 CommandArg = ''
-suppressOutput = False
 
 Command2FuncMap = {
 	":h":"PrintHelp",
@@ -35,8 +34,10 @@ Command2FuncMap = {
 
 # utility functions
 def GetInput(inputstring = ''):
-	global headerstring,footerstring,bodystring,bodylist,importset,importstring,CommandArg,variableSet,suppressOutput
-	if inputstring.startswith(":doc"):
+	global headerstring,footerstring,bodystring,bodylist,importset,importstring,CommandArg,variableSet
+	if inputstring == '':
+		return
+	elif inputstring.startswith(":doc"):
 		inputstring = inputstring.split(" ",1)
 		CommandArg = inputstring[1] if len(inputstring)>1 else ''
 		displayDoc()
@@ -59,21 +60,24 @@ def GetInput(inputstring = ''):
 		if pkg not in importset:
 			importset.append(pkg)
 	elif (len(re.split(' |=|:=|\(|\)',inputstring)) == 1) or inputstring.startswith('"') or inputstring.endswith('"'):	#input is value or string
-		run("fmt.Println(" + inputstring + ")")
+		err = run("fmt.Println(" + inputstring + ")")
+		if err != '':
+			print err,
 	elif isListinStartofString(["fmt.println(","fmt.print(","fmt.printf("], inputstring.lower()):		
-		run(inputstring)
+		err = run(inputstring)
+		if err != '':
+			print err,
 	elif inputstring[-1] == "{":
 		GetBlockInput(inputstring)
 	elif re.compile("[a-zA-Z0-9\.]+\([^\)]*\)(\.[^\)]*\))?").match(inputstring):		#caught a function call
 		flag = inputstring[-1]
 		if flag == ';':
-			suppressOutput = True
 			inputstring = inputstring[0:-1]
-			out,err = run("fmt.Println(" + inputstring + ")")
-			if err == '':
-				print out,
-			else:
-				run(inputstring)
+			err = run("fmt.Println(" + inputstring + ")")
+			if err != '':
+				err = run(inputstring)
+				if err != '':
+					print err,
 		else:
 			bodylist.append(inputstring)
 			headerstring += '\n\t' + inputstring
@@ -197,18 +201,14 @@ def GetBlockInput(startstring=''):
 		print "Error: ",str(e)
 
 def run(tempstr = ''):
-	global packageName,filename,headerstring,bodystring,suppressOutput
+	global packageName,filename,headerstring,bodystring
 	bodystring = GetBodyString(tempstr)
 	progstr = packageName + "\n" + GetImportString() + bodystring
 	f = open(filename,"w")
 	f.write(progstr)
 	f.close()
 	out,err = subprocess.Popen("go run " + filename,stderr=subprocess.PIPE).communicate()
-	if not suppressOutput:
-		print out+err,
-	else:
-		suppressOutput =False
-		return out,err
+	return err
 
 def PrintHelp():
 	print "\n  COMMANDS:\n"
