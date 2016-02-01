@@ -11,6 +11,9 @@ def main():
 	while (1):
 		try:
 			GetInput(raw_input("go>>").strip())
+		except KeyboardInterrupt:
+			print "\nKeyboardInterrupt"
+			pass
 		except Exception,e:
 			print "Error: ",str(e)
 			pass
