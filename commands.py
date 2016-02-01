@@ -20,7 +20,8 @@ CommandHelpStr = {  ":h CommandName" : "Print Help Menu",
 		":r, :x" : "Run as Go File",
 		":q" : "Quit the session",
 		":c, :cls" : "Clear the session,and Restart",
-		":doc <packageName> <functionName>" : "Display the documentation"
+		":doc <packageName> <functionName>" : "Display the documentation",
+		":save <filename>" : "Save the current session in to a file."
 		}
 CommandArg = ''
 
@@ -29,7 +30,8 @@ Command2FuncMap = {
 	":e":"editSourceFile",
 	":r":"run",
 	":x":"run",
-	":d":"display"
+	":d":"display",
+	":save":"SaveSessionIntoFile"
 }
 
 # utility functions
@@ -209,6 +211,24 @@ def run(tempstr = ''):
 	f.close()
 	out,err = subprocess.Popen("go run " + filename,stderr=subprocess.PIPE).communicate()
 	return err
+
+def SaveSessionIntoFile():
+	global CommandArg,packageName,headerstring,bodystring
+	if CommandArg != '':
+		dir = os.path.dirname(CommandArg)
+        	if dir != '' and not os.path.exists(dir):
+			if raw_input("Path does not exists: want to create.. ?(y/n) ").strip().lower() == 'y':
+				os.makedirs(dir)
+			else:
+				return
+		bodystring = GetBodyString()
+		progstr = packageName + "\n" + GetImportString() + bodystring
+		f = open(CommandArg,"w")
+		f.write(progstr)
+		f.close()
+		print "file saved successfully..."
+	else:
+		print "Insufficient Arguments, Check Help"
 
 def PrintHelp():
 	print "\n  COMMANDS:\n"
