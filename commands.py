@@ -182,7 +182,7 @@ def GetBlockInput(startstring=''):
 		while notabs > 0 :
 			inp = raw_input().strip()
 			if inp != '' :
-				if inp[-1] == '}':
+				if inp[-1] == '}' or inp[-3:] == '}()':
 					notabs -= 1
 				inp = ''.join(["\t" for i in range(notabs)]) + inp
 				tempbodylist.append(inp)
