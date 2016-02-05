@@ -1,11 +1,11 @@
 #!/usr/bin/python env
-import os,re,subprocess
+import os,re,subprocess,sys
 
 #config
 EDITOR = "vim"	#default editor
 CLEAR = "cls"	#clear command on ur system
 packageName = "package main"
-filename = "test.go"
+filename = "/tmp/test.go"
 
 importset = ['"fmt"']
 variableSet = []
@@ -36,7 +36,7 @@ Command2FuncMap = {
 
 # utility functions
 def GetInput(inputstring = ''):
-	global headerstring,footerstring,bodystring,bodylist,importset,importstring,CommandArg,variableSet
+	global headerstring,footerstring,bodystring,bodylist,importset,importstring,CommandArg,variableSet,filename
 	if inputstring == '':
 		return
 	elif inputstring.startswith(":doc"):
@@ -49,7 +49,9 @@ def GetInput(inputstring = ''):
 		init()
 		return
 	elif inputstring.startswith(":q"):
-		exit()
+		if os.path.exists(filename):
+			os.remove(filename)
+		sys.exit()
 	for k,fun in Command2FuncMap.iteritems():
 		if inputstring.startswith(k):
 			inputstring = inputstring.split(" ",1)
@@ -149,6 +151,8 @@ def init():			#initialize again
 	footerstring = ""
 	createHeaderString()
 	createFooterString()
+	if not os.path.exists("/tmp/"):
+		os.makedirs("/tmp/")
 
 def GetBodyString(tempstr = ''):
 	global bodystring,headerstring,footerstring
