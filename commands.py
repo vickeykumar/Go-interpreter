@@ -190,7 +190,7 @@ def GetBlockInput(startstring=''):
 					notabs -= 1
 				inp = ''.join(["\t" for i in range(notabs)]) + inp
 				tempbodylist.append(inp)
-				if inp[-1] == '{':
+				if inp[-1] == '{' and inp.strip()[0] != '}':
 					notabs += 1
 				
 		if isStringinStartofList("import",tempbodylist):
