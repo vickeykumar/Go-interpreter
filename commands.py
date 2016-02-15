@@ -1,27 +1,47 @@
 #!/usr/bin/python env
 import os,re,subprocess,sys
+import platform
 
 #config
+import logging
+logging.basicConfig(
+   level=logging.DEBUG,
+   format='%(asctime)s:%(levelname)s:%(lineno)d:%(message)s',
+   filename="/tmp/out.log",
+   filemode='w'
+)
+
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
+
 EDITOR = "vim"	#default editor
 CLEAR = "cls"	#clear command on ur system
+if not (platform.system() in ('Windows', 'Microsoft')):
+        import readline
+        CLEAR = 'clear'
 packageName = "package main"
 filename = "/tmp/test.go"
 
 importset = ['"fmt"']
+cgo = []
 variableSet = []
 importstring = ""
 bodylist = ["func main() {","/*body*/"]
 bodystring = ""
 headerstring = ""
 footerstring = ""
-CommandHelpStr = {  ":h CommandName" : "Print Help Menu",
-		":e <EditorName, line no>" : "Edit the Source File(in editor or single line)",
-		":d <line no, range>" : "Display a line or a Range of lines (given as L1:L2) or comma separated lines",
-		":r, :x" : "Run as Go File",
-		":q" : "Quit the session",
-		":c, :cls" : "Clear the session,and Restart",
-		":doc <packageName> <functionName>" : "Display the documentation",
-		":save <filename>" : "Save the current session in to a file."
+CommandHelpStr = {  ":h CommandName" : "Print Help Menu.",
+		":e <EditorName, line no>" : "Edit the Source File(in editor or single line).",
+		":d <line no, range>" : "Display a line or a Range of lines (given as L1:L2) or comma separated lines.",
+		":r, :x" : "Run as Go File.",
+		":q" : "Quit the session.",
+		":c, :cls" : "Clear the session,and Restart.",
+		":doc <packageName> <functionName>" : "Display the documentation.",
+		":save <filename>" : "Save the current session in to a file.",
+		":CGO" : "Cgo input (use KeyboardInterrupt to save)."
 		}
 CommandArg = ''
 
@@ -31,7 +51,8 @@ Command2FuncMap = {
 	":r":"run",
 	":x":"run",
 	":d":"display",
-	":save":"SaveSessionIntoFile"
+	":save":"SaveSessionIntoFile",
+	":CGO":"GetCgoInput"
 }
 
 # utility functions
@@ -63,7 +84,7 @@ def GetInput(inputstring = ''):
 		pkg = inputstring.split()[-1]
 		if pkg not in importset:
 			importset.append(pkg)
-	elif (len(re.split(' |=|:=|\(|\)',inputstring)) == 1) or inputstring.startswith('"') or inputstring.endswith('"'):	#input is value or string
+	elif (len(re.split(' |=|:=|\(|\)',inputstring)) == 1) or inputstring.startswith('"') :	#input is value or string
 		err = run("fmt.Println(" + inputstring + ")")
 		if err != '':
 			print err,
@@ -113,14 +134,14 @@ def displayDoc():
 	os.system(commandstr)
 
 def display():
-	global CommandArg,bodylist,importset
+	global CommandArg,bodylist,importset,cgo
 	try:
 		lines = CommandArg.strip().split(":")
 		if len(lines) < 3 and len(lines)>0:
 			lines = [int(i) for i in lines]
 			if len(lines)==2:
 				lines = range(lines[0],lines[1])
-			offset = len(importset) + 3
+			offset = len(importset) + len(cgo) + 3
 			for i in lines:
 				if (i>offset) and (i < (len(bodylist) + offset)):
 					print "line ",i,": ",bodylist[i - offset].strip()
@@ -141,9 +162,10 @@ def createFooterString():
 	footerstring = "\t/*!body*/\n" + tempstr + "\n}"
 
 def init():			#initialize again
-	global importset,variableSet,importstring,bodylist,bodystring,headerstring,footerstring
+	global importset,variableSet,importstring,bodylist,bodystring,headerstring,footerstring,cgo
 	importset = ['"fmt"']
 	variableSet = []
+	cgo = []
 	importstring = ""
 	bodylist = ["func main() {","/*body*/"]
 	bodystring = ""
@@ -176,6 +198,27 @@ def isStringinStartofList(str1,list1=[]):
 	for l in list1:
 		if l.strip().startswith(str1):
 			return True
+
+def GetCgoInput(startstring=''):
+	global cgo
+	try:
+		while(1):
+			inp = raw_input()
+			if inp.strip() == 'import "C"':
+				if inp.strip() in cgo:
+					del cgo[cgo.index(inp)]
+				cgo.append(inp)
+				break
+			if inp.strip() != '':
+				cgo.append(inp)
+	except KeyboardInterrupt:
+		print "OK"
+		pass
+
+def GetCgoString():
+	global cgo
+	return '\n'.join(cgo)
+
 def GetBlockInput(startstring=''):
 	global bodylist,headerstring
 	tempbodylist = []
@@ -209,11 +252,11 @@ def GetBlockInput(startstring=''):
 def run(tempstr = ''):
 	global packageName,filename,headerstring,bodystring
 	bodystring = GetBodyString(tempstr)
-	progstr = packageName + "\n" + GetImportString() + bodystring
+	progstr = packageName + "\n" + GetCgoString() + "\n" + GetImportString() + bodystring
 	f = open(filename,"w")
 	f.write(progstr)
 	f.close()
-	out,err = subprocess.Popen("go run " + filename,stderr=subprocess.PIPE).communicate()
+	out,err = subprocess.Popen("go run " + filename,stderr=subprocess.PIPE, shell=True).communicate()
 	return err
 
 def SaveSessionIntoFile():
@@ -226,7 +269,7 @@ def SaveSessionIntoFile():
 			else:
 				return
 		bodystring = GetBodyString()
-		progstr = packageName + "\n" + GetImportString() + bodystring
+		progstr = packageName + "\n" + GetCgoString() + "\n" + GetImportString() + bodystring
 		f = open(CommandArg,"w")
 		f.write(progstr)
 		f.close()
@@ -241,10 +284,10 @@ def PrintHelp():
 		print "\t",key.ljust(width),"\t",val
 
 def editSourceFile():
-	global CommandArg,bodylist
+	global CommandArg,bodylist,cgo
 	try:
 		i = int(CommandArg.strip())
-		offset = len(importset) + 3
+		offset = len(importset) + len(cgo) + 3
 		if (i>offset) and (i < (len(bodylist) + offset)):
 			notabs = 0
 			for c in bodylist[i - offset] :
@@ -267,3 +310,4 @@ def editSourceFile():
 		else:
 			print "ERROR: invalid argument ",str(e)
 #def UpdateFromFile():
+

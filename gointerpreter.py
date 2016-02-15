@@ -1,6 +1,10 @@
 #!/usr/bin/python env
 import os
 from commands import *
+import platform
+if not (platform.system() in ('Windows', 'Microsoft')):
+        import readline
+	CLEAR = 'clear'
 
 def main():
 	print "*************************************************************************"
