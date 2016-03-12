@@ -1,4 +1,4 @@
-#!/usr/bin/python env
+#!/usr/bin/python
 import os
 from commands import *
 import platform
@@ -19,10 +19,8 @@ def main():
 			print "\nKeyboardInterrupt"
 			pass
 		except Exception,e:
-			print "Error: ",str(e)
+			print "\nError: ",str(e)
 			pass
 
 if __name__ == "__main__":
 	main()
-
-

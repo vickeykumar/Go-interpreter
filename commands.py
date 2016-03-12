@@ -81,9 +81,11 @@ def GetInput(inputstring = ''):
 				globals()[fun]()
 			return
 	if inputstring.startswith("import "):
-		pkg = inputstring.split()[-1]
+		pkg = re.compile(" ").split(inputstring,1)[-1]
 		if pkg not in importset:
 			importset.append(pkg)
+	elif "`" in inputstring:
+		multiLineStringHandler(inputstring)
 	elif (len(re.split(' |=|:=|\(|\)',inputstring)) == 1) or inputstring.startswith('"') :	#input is value or string
 		err = run("fmt.Println(" + inputstring + ")")
 		if err != '':
@@ -183,7 +185,7 @@ def GetBodyString(tempstr = ''):
 
 def GetImportString():
 	global importstring,importset,bodystring
-	importstring = "import (\n\t" + "\n\t".join([pkg if pkg.split("/")[-1].strip('"')+'.' in bodystring else '_ '+pkg for pkg in importset]) + "\n)\n"
+	importstring = "import (\n\t" + "\n\t".join([pkg if (pkg.split("/")[-1].strip('"')+'.' in bodystring) or ( len(pkg.split())>1 and pkg.split()[0].strip()+'.' in bodystring) else '_ '+pkg for pkg in importset]) + "\n)\n"
 	return importstring
 
 def GetBodyString(tempstr = ''):
@@ -248,6 +250,24 @@ def GetBlockInput(startstring=''):
 			headerstring += '\n\t' + tempstr
 	except Exception,e:
 		print "Error: ",str(e)
+
+def multiLineStringHandler(inp = ''):
+	global bodylist,headerstring
+	tempbodylist = []
+	try:
+		count = inp.count("`")
+		tempbodylist.append(inp)
+		while inp[-1] != "`" or count < 2:
+			inp = raw_input()
+			count += inp.count("`")
+			if count > 2 :
+				raise SyntaxError("Invalid string.")
+			tempbodylist.append(inp)
+		tempstr = '\n'.join(tempbodylist)
+                bodylist += tempbodylist
+                headerstring += '\n' + tempstr
+	except Exception,e:
+                print "Error: ",str(e)
 
 def run(tempstr = ''):
 	global packageName,filename,headerstring,bodystring
