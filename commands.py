@@ -25,6 +25,7 @@ if not (platform.system() in ('Windows', 'Microsoft')):
 packageName = "package main"
 filename = "/tmp/test.go"
 
+KEYWORDS_CHECK = ["for ", "while ", "if ", "else ", "switch "]
 importset = ['"fmt"']
 cgo = []
 variableSet = []
@@ -41,7 +42,8 @@ CommandHelpStr = {  ":h CommandName" : "Print Help Menu.",
 		":c, :cls" : "Clear the session,and Restart.",
 		":doc <packageName> <functionName>" : "Display the documentation.",
 		":save <filename>" : "Save the current session in to a file.",
-		":CGO" : "Cgo input (use KeyboardInterrupt to save)."
+		":CGO" : "Cgo input (use KeyboardInterrupt to save).",
+		":load <filename>" : "loads from file."
 		}
 CommandArg = ''
 
@@ -52,7 +54,8 @@ Command2FuncMap = {
 	":x":"run",
 	":d":"display",
 	":save":"SaveSessionIntoFile",
-	":CGO":"GetCgoInput"
+	":CGO":"GetCgoInput",
+	":load":"LoadFile"
 }
 
 # utility functions
@@ -125,7 +128,9 @@ def updateVariableSet(inputstring=''):
 	if v != '' :		#variable caught
 		var1 =[i.strip() for i in v.split(",")]
 		for v in var1:
-			if v != "_" and v not in variableSet :
+			if isListinStartofString(KEYWORDS_CHECK,v):
+				return False
+			if v != "_" and v not in variableSet:
 				variableSet.append(v)
 				flag = True
 	return flag
@@ -279,10 +284,12 @@ def run(tempstr = ''):
 	out,err = subprocess.Popen("go run " + filename,stderr=subprocess.PIPE, shell=True).communicate()
 	return err
 
-def SaveSessionIntoFile():
+def SaveSessionIntoFile(file1=''):
 	global CommandArg,packageName,headerstring,bodystring
-	if CommandArg != '':
-		dir = os.path.dirname(CommandArg)
+	if file1 == '' :
+		file1 = CommandArg 
+	if file1 != '':
+		dir = os.path.dirname(file1)
         	if dir != '' and not os.path.exists(dir):
 			if raw_input("Path does not exists: want to create.. ?(y/n) ").strip().lower() == 'y':
 				os.makedirs(dir)
@@ -290,12 +297,40 @@ def SaveSessionIntoFile():
 				return
 		bodystring = GetBodyString()
 		progstr = packageName + "\n" + GetCgoString() + "\n" + GetImportString() + bodystring
-		f = open(CommandArg,"w")
+		f = open(file1,"w")
 		f.write(progstr)
 		f.close()
-		print "file saved successfully..."
+		print "File saved successfully..."
 	else:
 		print "Insufficient Arguments, Check Help"
+
+def LoadFromFile(filename=''):
+	try:
+		global cgo, bodylist, packageName,importset,headerstring,footerstring
+		f = open(filename)
+		data = f.read()
+		f.close()
+		data = data.split("\n")
+		#print data
+		index0 = data.index(packageName)
+		index1 = data.index("import (")
+		index2 = data.index(")")
+		index3 = data.index("\t/*body*/")
+		index4 = data.index('\t/*!body*/')
+		#print index0,index2,index3,index4
+		cgo = data[index0+1:index1]
+		importset = [pkg.strip().split()[-1] for pkg in data[index1+1:index2]]
+		bodylist = data[index2+1:index4]
+		for i in xrange(len(bodylist)):
+			if len(bodylist[i])>0 and bodylist[i][0]=="\t":
+				bodylist[i]=bodylist[i][1:]
+			#updateVariableSet(bodylist[i].strip())
+		createHeaderString()
+		createFooterString()
+		#print "cgo",cgo,"body: ",bodylist,"header: ",headerstring,"footer: ",footerstring,"import: ",importset
+		print "File loaded successfully..."
+	except Exception,e:
+		print "Error: Invalid File Format: ",str(e)
 
 def PrintHelp():
 	print "\n  COMMANDS:\n"
@@ -326,8 +361,14 @@ def editSourceFile():
 			print "invalid argument"
 	except Exception,e:
 		if (CommandArg.strip() == "vim") or (CommandArg.strip() == ""):
+			SaveSessionIntoFile(filename)
 			os.system(EDITOR + " " + filename)
+			LoadFromFile(filename)
 		else:
 			print "ERROR: invalid argument ",str(e)
-#def UpdateFromFile():
-
+def LoadFile():
+	global CommandArg
+	if CommandArg.strip() != "" :
+		LoadFromFile(CommandArg)
+	else:
+		print "ERROR: invalid argument "
