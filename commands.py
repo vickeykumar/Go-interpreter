@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(
    level=logging.DEBUG,
    format='%(asctime)s:%(levelname)s:%(lineno)d:%(message)s',
-   filename="/tmp/out.log",
+   filename="/tmp/gointerpreter/out.log",
    filemode='w'
 )
 
@@ -23,7 +23,7 @@ if not (platform.system() in ('Windows', 'Microsoft')):
         import readline
         CLEAR = 'clear'
 packageName = "package main"
-filename = "/tmp/test.go"
+filename = "/tmp/gointerpreter/test.go"
 
 KEYWORDS_CHECK = ["for ", "while ", "if ", "else ", "switch "]
 importset = ['"fmt"']
@@ -180,8 +180,8 @@ def init():			#initialize again
 	footerstring = ""
 	createHeaderString()
 	createFooterString()
-	if not os.path.exists("/tmp/"):
-		os.makedirs("/tmp/")
+	if not os.path.exists("/tmp/gointerpreter"):
+		os.makedirs("/tmp/gointerpreter")
 
 def GetBodyString(tempstr = ''):
 	global bodystring,headerstring,footerstring
