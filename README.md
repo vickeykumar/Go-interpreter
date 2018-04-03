@@ -2,11 +2,14 @@
 
 A python based go REPL like python command line to write and execute small go code snippets. If you want to test your go code snippets quickly or experiment with golang, please give it a try.
 
-Example
+### Example
 ![](doc/Examples.gif)
 
+### using documentation and loop demo
 ![](doc/doc.gif)
 
+### using structs, array and slices demo
+![](doc/struct.gif)
 
 ## Prerequisites
 
