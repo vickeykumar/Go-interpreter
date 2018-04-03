@@ -5,10 +5,10 @@ A python based go REPL like python command line to write and execute small go co
 ### Example
 ![](doc/Examples.gif)
 
-### using documentation and loop demo
+### Demo using documentation and loop
 ![](doc/doc.gif)
 
-### using structs, array and slices demo
+### Demo using structs, array and slices
 ![](doc/struct.gif)
 
 ## Prerequisites
