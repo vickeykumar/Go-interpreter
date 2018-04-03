@@ -5,7 +5,7 @@ A python based go REPL like python command line to write and execute small go co
 ### Example
 ![](doc/Examples.gif)
 
-### Demo using documentation and loop
+### Demo using documentation, loop and editing the inline code using default editor like vi
 ![](doc/doc.gif)
 
 ### Demo using structs, array and slices
