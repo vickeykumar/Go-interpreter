@@ -11,6 +11,9 @@ A python based go REPL like python command line to write and execute small go co
 ### Demo using structs, array and slices
 ![](doc/struct.gif)
 
+### encoding/json
+![](doc/json.gif)
+
 ## Prerequisites
 
 Go-interpreter requires go and godoc binaries installed in your system path. please set your GOPATH. 
