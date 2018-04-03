@@ -2,11 +2,14 @@
 
 A python based go REPL like python command line to write and execute small go code snippets. If you want to test your go code snippets quickly or experiment with golang, please give it a try.
 
-Example
+### Example
 ![](doc/Examples.gif)
 
+### Demo using documentation, loop and editing the inline code using default editor like vi
 ![](doc/doc.gif)
 
+### Demo using structs, array and slices
+![](doc/struct.gif)
 
 ## Prerequisites
 
@@ -44,6 +47,7 @@ gointerpreter is greatly inspired by python like interactive shell/REPL where us
 * Syntax completion
 * Configuration
 * API
+* Pretty Printing
 * Undoing input
 
 
