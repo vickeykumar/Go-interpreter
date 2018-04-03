@@ -47,6 +47,7 @@ gointerpreter is greatly inspired by python like interactive shell/REPL where us
 * Syntax completion
 * Configuration
 * API
+* Pretty Printing
 * Undoing input
 
 
