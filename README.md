@@ -6,7 +6,7 @@ Example
 
 ## Prerequisites
 
-Go-interpreter needs go binary installed in your system path. please set your GOPATH. 
+Go-interpreter requires go and godoc binaries installed in your system path. please set your GOPATH. 
 
 ## Installation
 
