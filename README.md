@@ -4,6 +4,8 @@ A python based go REPL like python command line to write and execute small go co
 Example
 ![](doc/Examples.gif)
 
+![](doc/doc.gif)
+
 ## Prerequisites
 
 Go-interpreter requires go and godoc binaries installed in your system path. please set your GOPATH. 
