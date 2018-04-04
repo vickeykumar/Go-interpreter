@@ -16,7 +16,10 @@ A python based go REPL like python command line to write and execute small go co
 
 ## Prerequisites
 
-Go-interpreter requires go and godoc binaries installed in your system path. please set your GOPATH. 
+Go-interpreter requires 
+* Go and godoc binaries https://golang.org/doc/install[installed] in your system path. please set your GOPATH before installing.
+* Pretty printing for go https://github.com/k0kubun/pp[pp] 
+* Showing documents requires https://golang.org/x/tools/cmd/godoc[godoc]
 
 ## Installation
 
@@ -53,7 +56,7 @@ gointerpreter is greatly inspired by python like interactive shell/REPL where us
 * Syntax completion
 * Configuration
 * API
-* Pretty Printing
+* ~~Pretty Printing~~
 * Undoing input
 
 
