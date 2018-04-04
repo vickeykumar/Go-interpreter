@@ -21,6 +21,9 @@ Go-interpreter requires go and godoc binaries installed in your system path. ple
 ## Installation
 
 clone this repository in your local machine and run following commands:
+```
+git clone https://github.com/vickeykumar/Go-interpreter.git
+```
 
 OS X & Linux:
 
