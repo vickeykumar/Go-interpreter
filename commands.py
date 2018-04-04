@@ -19,6 +19,7 @@ logging.getLogger('').addHandler(console)
 
 EDITOR = "vim"	#default editor
 CLEAR = "cls"	#clear command on ur system
+FOUND_PP = not os.system("go list github.com/k0kubun/pp > /dev/null 2>&1")	# Support for pretty printer
 if not (platform.system() in ('Windows', 'Microsoft')):
         import readline
         CLEAR = 'clear'
@@ -34,6 +35,7 @@ bodylist = ["func main() {","/*body*/"]
 bodystring = ""
 headerstring = ""
 footerstring = ""
+printer = "fmt"
 CommandHelpStr = {  ":h CommandName" : "Print Help Menu.",
 		":e <EditorName, line no>" : "Edit the Source File(in editor or single line).",
 		":d <line no, range>" : "Display a line or a Range of lines (given as L1:L2) or comma separated lines.",
@@ -58,9 +60,13 @@ Command2FuncMap = {
 	":load":"LoadFile"
 }
 
+if FOUND_PP:
+	importset.append('"github.com/k0kubun/pp"')
+	printer = "pp"
+
 # utility functions
 def GetInput(inputstring = ''):
-	global headerstring,footerstring,bodystring,bodylist,importset,importstring,CommandArg,variableSet,filename
+	global headerstring,footerstring,bodystring,bodylist,importset,importstring,CommandArg,variableSet,filename,printer
 	if inputstring == '':
 		return
 	elif inputstring.startswith(":doc"):
@@ -90,10 +96,10 @@ def GetInput(inputstring = ''):
 	elif "`" in inputstring:
 		multiLineStringHandler(inputstring)
 	elif (len(re.split(' |=|:=|\(|\)',inputstring)) == 1) or inputstring.startswith('"') :	#input is value or string
-		err = run("fmt.Println(" + inputstring + ")")
+		err = run(printer+".Println(" + inputstring + ")")
 		if err != '':
 			print err,
-	elif isListinStartofString(["fmt.println(","fmt.print(","fmt.printf("], inputstring.lower()):		
+	elif isListinStartofString(["fmt.println(","fmt.print(","fmt.printf(",printer+".println(",printer+".print(",printer+".printf("], inputstring.lower()):		
 		err = run(inputstring)
 		if err != '':
 			print err,
@@ -103,7 +109,7 @@ def GetInput(inputstring = ''):
 		flag = inputstring[-1]
 		if flag == ';':
 			inputstring = inputstring[0:-1]
-			err = run("fmt.Println(" + inputstring + ")")
+			err = run(printer+".Println(" + inputstring + ")")
 			if err != '':
 				err = run(inputstring)
 				if err != '':
@@ -169,7 +175,7 @@ def createFooterString():
 	footerstring = "\t/*!body*/\n" + tempstr + "\n}"
 
 def init():			#initialize again
-	global importset,variableSet,importstring,bodylist,bodystring,headerstring,footerstring,cgo
+	global importset,variableSet,importstring,bodylist,bodystring,headerstring,footerstring,cgo,printer
 	importset = ['"fmt"']
 	variableSet = []
 	cgo = []
@@ -180,8 +186,12 @@ def init():			#initialize again
 	footerstring = ""
 	createHeaderString()
 	createFooterString()
+	printer = "fmt"
 	if not os.path.exists("/tmp/gointerpreter"):
 		os.makedirs("/tmp/gointerpreter")
+	if FOUND_PP:
+		importset.append('"github.com/k0kubun/pp"')
+		printer = "pp"
 
 def GetBodyString(tempstr = ''):
 	global bodystring,headerstring,footerstring
