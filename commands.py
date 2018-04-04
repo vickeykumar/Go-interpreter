@@ -45,7 +45,8 @@ CommandHelpStr = {  ":h CommandName" : "Print Help Menu.",
 		":doc <packageName> <functionName>" : "Display the documentation.",
 		":save <filename>" : "Save the current session in to a file.",
 		":CGO" : "Cgo input (use KeyboardInterrupt to save).",
-		":load <filename>" : "loads from file."
+		":load <filename>" : "loads from file.",
+		":pp <True|False>" : "Enable or disable prettyprint"
 		}
 CommandArg = ''
 
@@ -57,7 +58,8 @@ Command2FuncMap = {
 	":d":"display",
 	":save":"SaveSessionIntoFile",
 	":CGO":"GetCgoInput",
-	":load":"LoadFile"
+	":load":"LoadFile",
+	":pp":"EnablePP"
 }
 
 if FOUND_PP:
@@ -382,3 +384,17 @@ def LoadFile():
 		LoadFromFile(CommandArg)
 	else:
 		print "ERROR: invalid argument "
+
+def EnablePP():
+	global CommandArg,printer,importset
+	flag = CommandArg.strip()
+	if flag.lower()=="true" or flag=="" :
+		if FOUND_PP:
+			if '"github.com/k0kubun/pp"' not in importset:
+				importset.append('"github.com/k0kubun/pp"')
+			printer = "pp"
+			print "prettyprinter enabled successfully."
+		else:
+			print "ERROR: prettyprinter package not Found in GOPATH"
+	else:
+		printer = "fmt"
