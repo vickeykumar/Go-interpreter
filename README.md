@@ -19,6 +19,9 @@ A python based go REPL like python command line to write and execute small go co
 Go-interpreter requires 
 * Go and godoc binaries [installed](https://golang.org/doc/install) in your system path. please set your GOPATH before installing.
 * Pretty printing for go [pp](https://github.com/k0kubun/pp) 
+```
+go get github.com/k0kubun/pp
+```
 * Showing documents requires [godoc](https://golang.org/x/tools/cmd/godoc)
 
 ## Installation
