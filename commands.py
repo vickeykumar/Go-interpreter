@@ -62,10 +62,6 @@ Command2FuncMap = {
 	":pp":"EnablePP"
 }
 
-if FOUND_PP:
-	importset.append('"github.com/k0kubun/pp"')
-	printer = "pp"
-
 # utility functions
 def GetInput(inputstring = ''):
 	global headerstring,footerstring,bodystring,bodylist,importset,importstring,CommandArg,variableSet,filename,printer
@@ -191,9 +187,6 @@ def init():			#initialize again
 	printer = "fmt"
 	if not os.path.exists("/tmp/gointerpreter"):
 		os.makedirs("/tmp/gointerpreter")
-	if FOUND_PP:
-		importset.append('"github.com/k0kubun/pp"')
-		printer = "pp"
 
 def GetBodyString(tempstr = ''):
 	global bodystring,headerstring,footerstring
