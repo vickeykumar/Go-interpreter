@@ -89,7 +89,9 @@ def GetInput(inputstring = ''):
 			inputstring = inputstring.split(" ",1)
 			CommandArg = inputstring[1] if len(inputstring)>1 else ''
 			if callable(globals()[fun]):
-				globals()[fun]()
+				err=globals()[fun]()
+				if err!=None:
+					print err
 			return
 	if inputstring.startswith("import "):
 		pkg = re.compile(" ").split(inputstring,1)[-1]
