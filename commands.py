@@ -3,6 +3,7 @@ import os,re,subprocess,sys
 import platform
 
 #config
+os.system("mkdir -p /tmp/gointerpreter && chmod 777 /tmp/gointerpreter")
 import logging
 logging.basicConfig(
    level=logging.DEBUG,
