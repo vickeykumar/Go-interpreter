@@ -144,7 +144,7 @@ def updateVariableSet(inputstring=''):
 
 def displayDoc():
 	global CommandArg
-	commandstr = 'godoc ' + CommandArg
+	commandstr = 'go doc ' + CommandArg
 	os.system(commandstr)
 
 def display():
