@@ -3,7 +3,7 @@ import os,re,subprocess,sys
 import platform
 
 #config
-os.system("mkdir -p /tmp/gointerpreter && chmod 777 /tmp/gointerpreter")
+os.system("mkdir -p /tmp/gointerpreter && chmod -R 777 /tmp/gointerpreter")
 import logging
 logging.basicConfig(
    level=logging.DEBUG,
@@ -17,6 +17,13 @@ console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
+try:
+        os.chmod("/tmp/gointerpreter/out.log", 0o777)
+        os.system("touch /tmp/gointerpreter/test.go")
+        os.chmod("/tmp/gointerpreter/test.go", 0o777)
+except Exception,e:
+        print(str(e))
+        pass
 
 EDITOR = "vim"	#default editor
 CLEAR = "cls"	#clear command on ur system
